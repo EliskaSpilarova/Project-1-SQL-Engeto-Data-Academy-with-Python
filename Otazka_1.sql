@@ -1,5 +1,4 @@
 -- Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
-
 WITH mzdy AS ( 
     SELECT 
         payroll_year AS rok,
