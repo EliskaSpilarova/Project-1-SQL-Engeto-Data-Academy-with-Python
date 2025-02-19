@@ -1,15 +1,32 @@
-INSERT INTO data_academy_content.t_eliska_spilarova_project_sql_primary_final (rok,prumerna_mzda,prumerna_cena,hdp) VALUES
-	 (2018,32485.087500000000,62.21394036208702,253045172103.95),
-	 (2017,30177.418750000000,61.027324813631544,245202003265.939),
-	 (2016,28386.537500000000,55.49040042598521,233151067380.883),
-	 (2015,27377.193750000000,56.12141853035151,227381745549.048),
-	 (2014,26699.012500000000,56.437005537098464,215755991069.112),
-	 (2013,26029.262500000000,55.93781838316719,210983331025.624),
-	 (2012,26423.062500000000,52.99512070874888,211080224602.858),
-	 (2011,25650.993750000000,49.56391583610187,212750323790.759),
-	 (2010,25072.293750000000,47.88986327888704,209069940963.177),
-	 (2009,24589.556250000000,47.0587187153936,204100298391.036);
-INSERT INTO data_academy_content.t_eliska_spilarova_project_sql_primary_final (rok,prumerna_mzda,prumerna_cena,hdp) VALUES
-	 (2008,23834.350000000000,50.49336748277988,214070259127.502),
-	 (2007,22094.550000000000,47.45214887484799,208469898850.69),
-	 (2006,20677.037500000000,44.62195903165718,197470142753.551);
+ CREATE TABLE t_eliska_spilarova_project_SQL_primary_final AS (
+    WITH mzdy AS (
+        SELECT
+            payroll_year AS rok,
+            AVG(value) AS prumerna_mzda
+        FROM czechia_payroll
+        WHERE value_type_code = 5958
+        GROUP BY payroll_year
+    ),
+    ceny AS (
+        SELECT
+            EXTRACT(YEAR FROM date_from) AS rok,
+            AVG(value) AS prumerna_cena
+        FROM czechia_price
+        GROUP BY EXTRACT(YEAR FROM date_from)
+    ),
+    gdp AS (
+        SELECT
+            year AS rok,
+            gdp AS hdp
+        FROM economies
+        WHERE country = 'Czech Republic'
+    )
+    SELECT
+        m.rok,
+        m.prumerna_mzda,
+        c.prumerna_cena,
+        g.hdp
+    FROM mzdy m
+    JOIN ceny c ON m.rok = c.rok
+    JOIN gdp g ON m.rok = g.rok
+);
